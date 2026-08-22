@@ -1,0 +1,4 @@
+interface:
+  display_name: "Brief"
+  short_description: "Plan, build, check, and archive code changes"
+  default_prompt: "Use $brief plan to define this change before implementation."
