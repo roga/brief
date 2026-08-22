@@ -51,32 +51,35 @@ brief/archive/
 
 ### Ask an AI agent to install Brief
 
-If your AI coding agent can access GitHub and your local project files, you can give it the repository URL and ask it to install Brief for you. For example:
+You can give Codex or Claude Code the repository URL and ask it to install Brief. For example:
 
 ```text
-Install the Brief skill from https://github.com/roga/brief for this project.
-Make it available to both Codex and Claude Code by following the installation
-instructions in the repository. Do not overwrite existing skill links; ask me
-if you find a conflict.
+Install the Brief Skill from the git repository at https://github.com/roga/brief.
+Follow the "Manual installation" section in the repository so that both Codex
+and Claude Code can use it. Do not overwrite any existing Skills during the
+installation; ask me first if you encounter any conflicts.
 ```
-
-The agent should clone the repository and link it into the skill directories described below. You can also perform the same steps manually.
 
 ### Manual installation
 
-Clone this repository, then link the same skill folder into Codex and Claude Code. Replace `/absolute/path/to/brief` with the path to this repository.
-
-### Project installation
-
-From the project that will use Brief:
-
 ```sh
-mkdir -p .agents/skills .claude/skills
-ln -s /absolute/path/to/brief .agents/skills/brief
-ln -s /absolute/path/to/brief .claude/skills/brief
+#!/usr/bin/env sh
+
+set -e
+
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' 0
+
+git clone --depth 1 https://github.com/roga/brief.git "$tmp/skill"
+rm -rf "$tmp/skill/.git"
+
+mkdir -p ~/.codex/skills ~/.claude/skills
+
+cp -R "$tmp/skill" ~/.codex/skills/brief
+cp -R "$tmp/skill" ~/.claude/skills/brief
 ```
 
-Codex reads `.agents/skills/brief/SKILL.md`. Claude Code reads `.claude/skills/brief/SKILL.md`. Both links use the same `SKILL.md`.
+- Note: Make sure you do not already have a Skill named `brief` installed.
 
 ## Use with Codex
 

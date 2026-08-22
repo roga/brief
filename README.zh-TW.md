@@ -51,31 +51,33 @@ brief/archive/
 
 ### 請 AI Agent 安裝 Brief
 
-如果你的 AI coding agent 可以存取 GitHub 與本機專案檔案，你可以提供 repository URL，並請它代為安裝 Brief。例如：
+你可以提供 repository URL，讓 Codex 或是 Claude Code 代為安裝 Brief， Prompt 如下：
 
 ```text
-請從 https://github.com/roga/brief 為這個專案安裝 Brief Skill。
-請依照 repository 中的安裝說明，讓 Codex 和 Claude Code 都能使用它。
-不要覆蓋既有的 Skill 連結；如果遇到衝突，請先詢問我。
+請從 https://github.com/roga/brief 這個 git repository 安裝 Brief Skill。
+安裝方法請依照 repository 中的 「手動安裝」區段，讓 Codex 和 Claude Code 都能使用它。
+安裝的過程中不要覆蓋既有的 Skill ；如果遇到任何衝突，請先詢問我。
 ```
-
-Agent 應該會 clone 此 repository，並將它連結到下方說明的 Skill 目錄。你也可以手動執行相同步驟。
 
 ### 手動安裝
 
-Clone 此 repository，接著將同一個 Skill 資料夾連結到 Codex 與 Claude Code。請將 `/absolute/path/to/brief` 替換為此 repository 的實際路徑。
-
-### 專案安裝
-
-請在要使用 Brief 的專案中執行：
-
 ```sh
-mkdir -p .agents/skills .claude/skills
-ln -s /absolute/path/to/brief .agents/skills/brief
-ln -s /absolute/path/to/brief .claude/skills/brief
-```
+#!/usr/bin/env sh
 
-Codex 會讀取 `.agents/skills/brief/SKILL.md`，Claude Code 則會讀取 `.claude/skills/brief/SKILL.md`。兩個連結共用同一份 `SKILL.md`。
+set -e
+
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' 0
+
+git clone --depth 1 https://github.com/roga/brief.git "$tmp/skill"
+rm -rf "$tmp/skill/.git"
+
+mkdir -p ~/.codex/skills ~/.claude/skills
+
+cp -R "$tmp/skill" ~/.codex/skills/brief
+cp -R "$tmp/skill" ~/.claude/skills/brief
+```
+- 提示：請確認你沒有已經安裝的 skill 也叫做 brief
 
 ## 在 Codex 中使用
 
