@@ -47,9 +47,15 @@ Confirm that all requirements and acceptance criteria are complete, then move th
 brief/archive/
 ```
 
-## Install
+## Installation
 
-### Ask an AI agent to install Brief
+### Option 1: Install via npx
+
+```sh
+npx skills add roga/brief
+```
+
+### Option 2: Ask an AI agent to install Brief
 
 You can give Codex or Claude Code the repository URL and ask it to install Brief. For example:
 
@@ -60,7 +66,7 @@ and Claude Code can use it. Do not overwrite any existing Skills during the
 installation; ask me first if you encounter any conflicts.
 ```
 
-### Manual installation
+### Option 3: Manual installation
 
 ```sh
 #!/usr/bin/env sh
