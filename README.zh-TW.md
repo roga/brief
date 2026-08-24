@@ -47,9 +47,15 @@ Brief 會顯示提案並等待核准。在執行 `plan` 時，它不會撰寫實
 brief/archive/
 ```
 
-## 安裝
+## 安裝方式
 
-### 請 AI Agent 安裝 Brief
+### 選項 1：透過 npx 安裝
+
+```sh
+npx skills add roga/brief
+```
+
+### 選項 2：請 AI Agent 安裝 Brief
 
 你可以提供 repository URL，讓 Codex 或是 Claude Code 代為安裝 Brief， Prompt 如下：
 
@@ -59,7 +65,7 @@ brief/archive/
 安裝的過程中不要覆蓋既有的 Skill ；如果遇到任何衝突，請先詢問我。
 ```
 
-### 手動安裝
+### 選項 3：手動安裝
 
 ```sh
 #!/usr/bin/env sh
