@@ -26,7 +26,7 @@ If the command is missing or unknown, show these four commands and ask the user 
 - Do not over-design the solution.
 - Reuse existing code when it fits.
 - Follow the project's coding style and conventions.
-- Prefer the language the user normally uses for responses and generated documents, unless the user requests a different language.
+- Write generated Markdown files in the language used in the conversation between the AI agent and the user. If the language cannot be determined, use English by default.
 - If anything is unclear, contradictory, incorrect, or needs a user decision, stop and ask a specific question. Do not guess.
 - Ask before any dangerous operation. Explain what could happen.
 
