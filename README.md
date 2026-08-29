@@ -79,30 +79,38 @@ trap 'rm -rf "$tmp"' 0
 git clone --depth 1 https://github.com/roga/brief.git "$tmp/skill"
 rm -rf "$tmp/skill/.git"
 
-mkdir -p ~/.codex/skills ~/.claude/skills
+if [ -e ~/.agents/skills/brief ] || [ -L ~/.agents/skills/brief ]; then
+  echo "A Skill named brief already exists in ~/.agents/skills." >&2
+  exit 1
+fi
 
-cp -R "$tmp/skill" ~/.codex/skills/brief
-cp -R "$tmp/skill" ~/.claude/skills/brief
+if [ -e ~/.claude/skills/brief ] || [ -L ~/.claude/skills/brief ]; then
+  echo "A Skill named brief already exists in ~/.claude/skills." >&2
+  exit 1
+fi
+
+mkdir -p ~/.agents/skills ~/.claude/skills
+
+cp -R "$tmp/skill" ~/.agents/skills/brief
+ln -s ~/.agents/skills/brief ~/.claude/skills/brief
 ```
 
 - Note: Make sure you do not already have a Skill named `brief` installed.
+- Compatibility note (verified 2026-08-30): The Agent Skills specification does
+  not mandate installation paths, but `~/.agents/skills` is a widely adopted
+  convention for sharing Skills across compatible AI agents. Claude Code
+  currently discovers personal Skills from `~/.claude/skills`, so the manual
+  installation above creates a symbolic link to the shared copy. See the
+  [Agent Skills implementation guide](https://agentskills.io/client-implementation/adding-skills-support)
+  and [Claude Code Skills documentation](https://code.claude.com/docs/en/slash-commands).
 
-## Use with Codex
+## Use with AI Agents
 
 ```text
 $brief plan add a todo list
 $brief make
 $brief check
 $brief close
-```
-
-## Use with Claude Code
-
-```text
-/brief plan add a todo list
-/brief make
-/brief check
-/brief close
 ```
 
 If more than one open proposal exists, add the proposal file name or path to the command.

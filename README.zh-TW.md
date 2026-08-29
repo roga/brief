@@ -57,12 +57,12 @@ npx skills add roga/brief
 
 ### 選項 2：請 AI Agent 安裝 Brief
 
-你可以提供 repository URL，讓 Codex 或是 Claude Code 代為安裝 Brief， Prompt 如下：
+你可以將儲存庫網址提供給 Codex 或 Claude Code，並請它安裝 Brief。例如：
 
 ```text
-請從 https://github.com/roga/brief 這個 git repository 安裝 Brief Skill。
-安裝方法請依照 repository 中的 「手動安裝」區段，讓 Codex 和 Claude Code 都能使用它。
-安裝的過程中不要覆蓋既有的 Skill ；如果遇到任何衝突，請先詢問我。
+請從 https://github.com/roga/brief 這個 Git 儲存庫安裝 Brief Skill。
+請依照儲存庫中的「手動安裝」章節進行，讓 Codex 與 Claude Code 都能使用它。
+安裝時請勿覆寫任何現有的 Skill；如果遇到衝突，請先詢問我。
 ```
 
 ### 選項 3：手動安裝
@@ -78,29 +78,37 @@ trap 'rm -rf "$tmp"' 0
 git clone --depth 1 https://github.com/roga/brief.git "$tmp/skill"
 rm -rf "$tmp/skill/.git"
 
-mkdir -p ~/.codex/skills ~/.claude/skills
+if [ -e ~/.agents/skills/brief ] || [ -L ~/.agents/skills/brief ]; then
+  echo "A Skill named brief already exists in ~/.agents/skills." >&2
+  exit 1
+fi
 
-cp -R "$tmp/skill" ~/.codex/skills/brief
-cp -R "$tmp/skill" ~/.claude/skills/brief
+if [ -e ~/.claude/skills/brief ] || [ -L ~/.claude/skills/brief ]; then
+  echo "A Skill named brief already exists in ~/.claude/skills." >&2
+  exit 1
+fi
+
+mkdir -p ~/.agents/skills ~/.claude/skills
+
+cp -R "$tmp/skill" ~/.agents/skills/brief
+ln -s ~/.agents/skills/brief ~/.claude/skills/brief
 ```
-- 提示：請確認你沒有已經安裝的 skill 也叫做 brief
 
-## 在 Codex 中使用
+- 注意：請確認尚未安裝名為 `brief` 的 Skill。
+- 相容性說明（於 2026-08-30 驗證）：Agent Skills 規格並未規定安裝路徑，
+  但 `~/.agents/skills` 是讓相容 AI Agent 共用 Skill 時廣泛採用的慣例。
+  Claude Code 目前會從 `~/.claude/skills` 尋找個人 Skill，因此上述手動安裝方式
+  會建立一個指向共用副本的符號連結。請參閱
+  [Agent Skills 實作指南](https://agentskills.io/client-implementation/adding-skills-support)
+  與 [Claude Code Skills 文件](https://code.claude.com/docs/en/slash-commands)。
+
+## 搭配 AI Agent 使用
 
 ```text
 $brief plan 新增待辦清單
 $brief make
 $brief check
 $brief close
-```
-
-## 在 Claude Code 中使用
-
-```text
-/brief plan 新增待辦清單
-/brief make
-/brief check
-/brief close
 ```
 
 如果同時存在多份尚未結案的提案，請在指令中加上提案檔名或路徑。
