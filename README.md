@@ -47,38 +47,64 @@ Confirm that all requirements and acceptance criteria are complete, then move th
 brief/archive/
 ```
 
-## Install
+## Installation
 
-### Ask an AI agent to install Brief
-
-If your AI coding agent can access GitHub and your local project files, you can give it the repository URL and ask it to install Brief for you. For example:
-
-```text
-Install the Brief skill from https://github.com/roga/brief for this project.
-Make it available to both Codex and Claude Code by following the installation
-instructions in the repository. Do not overwrite existing skill links; ask me
-if you find a conflict.
-```
-
-The agent should clone the repository and link it into the skill directories described below. You can also perform the same steps manually.
-
-### Manual installation
-
-Clone this repository, then link the same skill folder into Codex and Claude Code. Replace `/absolute/path/to/brief` with the path to this repository.
-
-### Project installation
-
-From the project that will use Brief:
+### Option 1: Install via npx
 
 ```sh
-mkdir -p .agents/skills .claude/skills
-ln -s /absolute/path/to/brief .agents/skills/brief
-ln -s /absolute/path/to/brief .claude/skills/brief
+npx skills add roga/brief
 ```
 
-Codex reads `.agents/skills/brief/SKILL.md`. Claude Code reads `.claude/skills/brief/SKILL.md`. Both links use the same `SKILL.md`.
+### Option 2: Ask an AI agent to install Brief
 
-## Use with Codex
+You can give Codex or Claude Code the repository URL and ask it to install Brief. For example:
+
+```text
+Install the Brief Skill from the git repository at https://github.com/roga/brief.
+Follow the "Manual installation" section in the repository so that both Codex
+and Claude Code can use it. Do not overwrite any existing Skills during the
+installation; ask me first if you encounter any conflicts.
+```
+
+### Option 3: Manual installation
+
+```sh
+#!/usr/bin/env sh
+
+set -e
+
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' 0
+
+git clone --depth 1 https://github.com/roga/brief.git "$tmp/skill"
+rm -rf "$tmp/skill/.git"
+
+if [ -e ~/.agents/skills/brief ] || [ -L ~/.agents/skills/brief ]; then
+  echo "A Skill named brief already exists in ~/.agents/skills." >&2
+  exit 1
+fi
+
+if [ -e ~/.claude/skills/brief ] || [ -L ~/.claude/skills/brief ]; then
+  echo "A Skill named brief already exists in ~/.claude/skills." >&2
+  exit 1
+fi
+
+mkdir -p ~/.agents/skills ~/.claude/skills
+
+cp -R "$tmp/skill" ~/.agents/skills/brief
+ln -s ~/.agents/skills/brief ~/.claude/skills/brief
+```
+
+- Note: Make sure you do not already have a Skill named `brief` installed.
+- Compatibility note (verified 2026-08-30): The Agent Skills specification does
+  not mandate installation paths, but `~/.agents/skills` is a widely adopted
+  convention for sharing Skills across compatible AI agents. Claude Code
+  currently discovers personal Skills from `~/.claude/skills`, so the manual
+  installation above creates a symbolic link to the shared copy. See the
+  [Agent Skills implementation guide](https://agentskills.io/client-implementation/adding-skills-support)
+  and [Claude Code Skills documentation](https://code.claude.com/docs/en/slash-commands).
+
+## Use with AI Agents
 
 ```text
 $brief plan add a todo list
@@ -87,16 +113,7 @@ $brief check
 $brief close
 ```
 
-## Use with Claude Code
-
-```text
-/brief plan add a todo list
-/brief make
-/brief check
-/brief close
-```
-
-If more than one open proposal exists, add the proposal file name or path to the command.
+<img src="https://github.com/user-attachments/assets/7eb03d6f-6a24-476d-a093-8c6c868f6e50" alt="screenshot">
 
 ## Principles
 

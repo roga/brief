@@ -13,7 +13,7 @@ Read the first argument as the command:
 
 - `plan`: Write a proposal and wait for approval.
 - `make`: Implement an approved proposal.
-- `check`: Check the implementation against the proposal.
+- `check`: Optionally check the implementation against the proposal.
 - `close`: Archive a completed proposal.
 
 If the command is missing or unknown, show these four commands and ask the user to choose one. Do not change files until the command is clear.
@@ -26,6 +26,7 @@ If the command is missing or unknown, show these four commands and ask the user 
 - Do not over-design the solution.
 - Reuse existing code when it fits.
 - Follow the project's coding style and conventions.
+- Write generated Markdown files in the language used in the conversation between the AI agent and the user. If the language cannot be determined, use English by default.
 - If anything is unclear, contradictory, incorrect, or needs a user decision, stop and ask a specific question. Do not guess.
 - Ask before any dangerous operation. Explain what could happen.
 
@@ -98,7 +99,7 @@ Use this mode only when the command is `make`. The `make` command means the user
 9. Read the proposal again and confirm that the marker was saved as `- [V]`.
 10. Report `R# complete` with a short description of the result, then continue with the next unchecked requirement unless user input is needed.
 11. Do not mark acceptance criteria during `make`.
-12. When every requirement is marked `- [V]`, report that all requirements are complete and ask the user to run `brief check`.
+12. When every requirement is marked `- [V]`, report that all requirements are complete. Tell the user they can run `brief check` to verify the acceptance criteria or `brief close` to archive the proposal without running those checks.
 
 ## Check
 
@@ -122,9 +123,9 @@ Use this mode only when the command is `check`.
 Use this mode only when the command is `close`.
 
 1. Find the proposal by using the same selection rules as `make`.
-2. Read the whole proposal. Confirm that every requirement and every acceptance criterion is marked `- [V]`.
-3. If any item is unchecked, list it and stop. Do not archive incomplete work.
+2. Read the whole proposal. Confirm that every requirement is marked `- [V]`. Acceptance criteria do not need to be checked before closing.
+3. If any requirement is unchecked, list it and stop. Do not archive incomplete work.
 4. Create `brief/archive/` if it does not exist.
 5. Move the proposal file into `brief/archive/` without changing its file name. Do not overwrite an existing archive file. If the target already exists, stop and ask the user how to resolve it.
 6. Confirm that the archived file exists at its new path.
-7. Report that the proposal is closed. Add one short paragraph that summarizes the request, the implementation, and the verified result so the user can understand what was completed later.
+7. Report that the proposal is closed. Add one short paragraph that summarizes the request, the implementation, and whether the acceptance criteria were checked so the user can understand what was completed later.

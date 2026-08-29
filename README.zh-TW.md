@@ -47,37 +47,62 @@ Brief 會顯示提案並等待核准。在執行 `plan` 時，它不會撰寫實
 brief/archive/
 ```
 
-## 安裝
+## 安裝方式
 
-### 請 AI Agent 安裝 Brief
-
-如果你的 AI coding agent 可以存取 GitHub 與本機專案檔案，你可以提供 repository URL，並請它代為安裝 Brief。例如：
-
-```text
-請從 https://github.com/roga/brief 為這個專案安裝 Brief Skill。
-請依照 repository 中的安裝說明，讓 Codex 和 Claude Code 都能使用它。
-不要覆蓋既有的 Skill 連結；如果遇到衝突，請先詢問我。
-```
-
-Agent 應該會 clone 此 repository，並將它連結到下方說明的 Skill 目錄。你也可以手動執行相同步驟。
-
-### 手動安裝
-
-Clone 此 repository，接著將同一個 Skill 資料夾連結到 Codex 與 Claude Code。請將 `/absolute/path/to/brief` 替換為此 repository 的實際路徑。
-
-### 專案安裝
-
-請在要使用 Brief 的專案中執行：
+### 選項 1：透過 npx 安裝
 
 ```sh
-mkdir -p .agents/skills .claude/skills
-ln -s /absolute/path/to/brief .agents/skills/brief
-ln -s /absolute/path/to/brief .claude/skills/brief
+npx skills add roga/brief
 ```
 
-Codex 會讀取 `.agents/skills/brief/SKILL.md`，Claude Code 則會讀取 `.claude/skills/brief/SKILL.md`。兩個連結共用同一份 `SKILL.md`。
+### 選項 2：請 AI Agent 安裝 Brief
 
-## 在 Codex 中使用
+你可以將儲存庫網址提供給 Codex 或 Claude Code，並請它安裝 Brief。例如：
+
+```text
+請從 https://github.com/roga/brief 這個 Git 儲存庫安裝 Brief Skill。
+請依照儲存庫中的「手動安裝」章節進行，讓 Codex 與 Claude Code 都能使用它。
+安裝時請勿覆寫任何現有的 Skill；如果遇到衝突，請先詢問我。
+```
+
+### 選項 3：手動安裝
+
+```sh
+#!/usr/bin/env sh
+
+set -e
+
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' 0
+
+git clone --depth 1 https://github.com/roga/brief.git "$tmp/skill"
+rm -rf "$tmp/skill/.git"
+
+if [ -e ~/.agents/skills/brief ] || [ -L ~/.agents/skills/brief ]; then
+  echo "A Skill named brief already exists in ~/.agents/skills." >&2
+  exit 1
+fi
+
+if [ -e ~/.claude/skills/brief ] || [ -L ~/.claude/skills/brief ]; then
+  echo "A Skill named brief already exists in ~/.claude/skills." >&2
+  exit 1
+fi
+
+mkdir -p ~/.agents/skills ~/.claude/skills
+
+cp -R "$tmp/skill" ~/.agents/skills/brief
+ln -s ~/.agents/skills/brief ~/.claude/skills/brief
+```
+
+- 注意：請確認尚未安裝名為 `brief` 的 Skill。
+- 相容性說明（於 2026-08-30 驗證）：Agent Skills 規格並未規定安裝路徑，
+  但 `~/.agents/skills` 是讓相容 AI Agent 共用 Skill 時廣泛採用的慣例。
+  Claude Code 目前會從 `~/.claude/skills` 尋找個人 Skill，因此上述手動安裝方式
+  會建立一個指向共用副本的符號連結。請參閱
+  [Agent Skills 實作指南](https://agentskills.io/client-implementation/adding-skills-support)
+  與 [Claude Code Skills 文件](https://code.claude.com/docs/en/slash-commands)。
+
+## 搭配 AI Agent 使用
 
 ```text
 $brief plan 新增待辦清單
@@ -86,16 +111,7 @@ $brief check
 $brief close
 ```
 
-## 在 Claude Code 中使用
-
-```text
-/brief plan 新增待辦清單
-/brief make
-/brief check
-/brief close
-```
-
-如果同時存在多份尚未結案的提案，請在指令中加上提案檔名或路徑。
+<img src="https://github.com/user-attachments/assets/7eb03d6f-6a24-476d-a093-8c6c868f6e50" alt="screenshot">
 
 ## 原則
 
